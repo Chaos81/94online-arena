@@ -7087,6 +7087,17 @@ function __chatAdd(who, text, mine) {
     log.append(row));
   while (log.children.length > 100) log.firstChild.remove();
   log.scrollTop = log.scrollHeight;
+  let ov = k(`chat-ov-log`),
+    orow = row.cloneNode(!0);
+  (ov.append(orow), ov.children.length > 6 && ov.firstChild.remove(), __ovShow());
+}
+var __ovTimer = 0;
+function __ovShow() {
+  let w = k(`screen-wrap`);
+  (w.classList.add(`chat-active`), clearTimeout(__ovTimer));
+  __ovTimer = setTimeout(() => {
+    document.activeElement !== k(`chat-ov-input`) && w.classList.remove(`chat-active`);
+  }, 8e3);
 }
 function __chatReceive(text) {
   let now = performance.now();
@@ -7095,9 +7106,8 @@ function __chatReceive(text) {
   (__chatTimes.push(now), __chatAdd(`Opponent`, text.replace(/[\u0000-\u001f\u007f]/g, ` `), !1));
   document.hidden && Xa(`New chat message`);
 }
-function __chatSend() {
-  let input = k(`chat-input`),
-    text = input.value.replace(/[\u0000-\u001f\u007f]/g, ` `).trim().slice(0, 200),
+function __chatSend(input = k(`chat-input`)) {
+  let text = input.value.replace(/[\u0000-\u001f\u007f]/g, ` `).trim().slice(0, 200),
     now = performance.now();
   if (!text || now - __chatLastSend < 400) return;
   try {
@@ -7107,10 +7117,13 @@ function __chatSend() {
     return;
   }
   ((__chatLastSend = now), __chatAdd(`You`, text, !0), (input.value = ``));
+  input.id === `chat-ov-input` && (input.blur(), k(`game-canvas`).focus());
 }
 function __chatOpen(on) {
   let box = k(`chat-box`);
-  ((box.hidden = !on), on || (k(`chat-log`).textContent = ``, (k(`chat-input`).value = ``)));
+  ((box.hidden = !on),
+    k(`screen-wrap`).classList.toggle(`chat-live`, on),
+    on || ((k(`chat-log`).textContent = ``), (k(`chat-ov-log`).textContent = ``), (k(`chat-input`).value = ``), (k(`chat-ov-input`).value = ``)));
 }
 var __routeKind = null,
   __routeBusy = !1,
@@ -9177,21 +9190,27 @@ globalThis.__arena = Object.freeze({
 });
 globalThis.__setEmuVolume = (v, m) => A.setVolume(v, m);
 globalThis.__getEmuVolume = () => ({ volume: A.volume, muted: A.muted });
-k(`chat-send`).addEventListener(`click`, __chatSend);
+k(`chat-send`).addEventListener(`click`, () => __chatSend());
 k(`chat-input`).addEventListener(`keydown`, (e) => {
   e.key === `Enter` && (e.preventDefault(), __chatSend());
 });
+k(`chat-ov-input`).addEventListener(`keydown`, (e) => {
+  e.key === `Enter` && (e.preventDefault(), __chatSend(k(`chat-ov-input`)));
+  e.key === `Escape` && (k(`chat-ov-input`).blur(), k(`game-canvas`).focus());
+});
+k(`chat-ov-input`).addEventListener(`focus`, () => (k(`screen-wrap`).classList.add(`chat-typing`), __ovShow()));
+k(`chat-ov-input`).addEventListener(`blur`, () => (k(`screen-wrap`).classList.remove(`chat-typing`), __ovShow()));
 addEventListener(
   `keydown`,
   (e) => {
     if (e.key !== `Tab` || e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) return;
     let box = k(`chat-box`),
-      input = k(`chat-input`);
+      input = k(`screen-wrap`).classList.contains(`is-fullscreen`) ? k(`chat-ov-input`) : k(`chat-input`);
     if (box.hidden || document.querySelector(`dialog[open]`)) return;
     if (document.activeElement === input) {
       (e.preventDefault(), input.blur(), k(`game-canvas`).focus());
     } else if (!/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName || ``)) {
-      (e.preventDefault(), input.focus());
+      (e.preventDefault(), k(`screen-wrap`).classList.add(`chat-typing`), input.focus());
     }
   },
   !0,

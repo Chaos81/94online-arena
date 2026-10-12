@@ -23,6 +23,14 @@
 .chat-row input{flex:1;min-width:0;padding:.45rem .6rem;border:1px solid #cbd5e1;border-radius:6px;font:inherit}
 .screen-wrap.is-fullscreen:not(.cursor-idle),.screen-wrap.is-fullscreen:not(.cursor-idle) canvas,.screen-wrap:fullscreen:not(.cursor-idle),.screen-wrap:fullscreen:not(.cursor-idle) canvas{cursor:auto !important}
 .screen-wrap.is-fullscreen.cursor-idle,.screen-wrap.is-fullscreen.cursor-idle canvas,.screen-wrap:fullscreen.cursor-idle,.screen-wrap:fullscreen.cursor-idle canvas{cursor:none !important}
+.chat-overlay{display:none}
+.screen-wrap.is-fullscreen.chat-live .chat-overlay{display:flex;flex-direction:column;gap:.35rem;position:absolute;left:1rem;bottom:1rem;width:min(420px,45vw);z-index:5;pointer-events:none}
+.chat-ov-log{display:flex;flex-direction:column;gap:2px;opacity:0;transition:opacity .4s;font:14px/1.3 Arial,sans-serif;color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000}
+.screen-wrap.chat-active .chat-ov-log,.screen-wrap.chat-typing .chat-ov-log{opacity:1}
+.chat-ov-log .chat-msg{margin:0;padding:2px 6px;background:rgba(0,0,0,.45);border-radius:4px;overflow-wrap:anywhere}
+.chat-ov-log .chat-msg strong{color:#cbd5e1}.chat-ov-log .chat-msg.mine strong{color:#93c5fd}
+.chat-overlay input{display:none;pointer-events:auto;padding:.4rem .6rem;border:1px solid #64748b;border-radius:6px;background:rgba(15,23,42,.9);color:#fff;font:14px Arial,sans-serif}
+.screen-wrap.chat-typing .chat-overlay input{display:block}
 </style></head>
 <body>
   <a class="skip-link" href="#setup">Skip to match setup</a>
@@ -45,7 +53,7 @@
           <button id="scanlines-in-game" class="scanlines-in-game" type="button" aria-pressed="false">Scanlines: off</button>
           <button id="help-in-game" class="in-game-help" type="button" aria-haspopup="dialog" aria-controls="help-dialog">Help</button>
           <button id="controller-in-game" class="in-game-controller" type="button">Controller</button>
-          <div id="fullscreen-hint" class="fullscreen-hint" hidden>Press Esc to exit full screen</div>
+          <div id="fullscreen-hint" class="fullscreen-hint" hidden>Press Esc to exit full screen</div><div id="chat-overlay" class="chat-overlay"><div id="chat-ov-log" class="chat-ov-log" aria-hidden="true"></div><input id="chat-ov-input" type="text" maxlength="200" autocomplete="off" placeholder="Chat · Enter to send · Tab to cancel" aria-label="Chat message"></div>
           <div id="game-overlay" class="game-overlay">
                         <img class="console-art console-genesis" src="./assets/console-genesis.jpg" alt="Sega Genesis" onerror="this.onerror=null;this.src='./assets/console-genesis.svg'" /><img class="console-art console-snes" src="./assets/console-snes.jpg" alt="Super Nintendo" onerror="this.onerror=null;this.src='./assets/console-snes.svg'" /><div class="screen-copy"><p id="game-message">Choose your system and ROM,<br />then host online or play locally.</p><span id="screen-tag" class="screen-tag">GENESIS</span></div>
           </div>
