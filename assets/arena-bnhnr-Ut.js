@@ -7080,14 +7080,17 @@ function Va(e) {
 }
 var __chatTimes = [],
   __chatLastSend = 0;
-function __chatAdd(who, text, mine) {
+function __chatAdd(who, text, mine, tag) {
   let log = k(`chat-log`),
     row = document.createElement(`div`),
     name = document.createElement(`strong`),
-    body = document.createElement(`span`);
+    body = document.createElement(`span`),
+    tg = document.createElement(`em`);
   ((row.className = `chat-msg` + (mine ? ` mine` : ``)),
     (name.textContent = who + `: `),
     (body.textContent = text),
+    (tag &&
+      ((tg.className = `chat-tag`), (tg.textContent = tag), row.append(tg, document.createTextNode(` `)))),
     row.append(name, body),
     log.append(row));
   while (log.children.length > 100) log.firstChild.remove();
@@ -7114,7 +7117,7 @@ function __chatReceive(text, name) {
   let now = performance.now();
   __chatTimes = __chatTimes.filter((t) => now - t < 5e3);
   if (__chatTimes.length >= 8) return;
-  (__chatTimes.push(now), __chatAdd(__cleanName(name) || `Opponent`, text.replace(/[\u0000-\u001f\u007f]/g, ` `), !1));
+  (__chatTimes.push(now), __chatAdd(__cleanName(name) || `Opponent`, text.replace(/[\u0000-\u001f\u007f]/g, ` `), !1, N ? `Guest` : `Host`));
   document.hidden && Xa(`New chat message`);
 }
 function __chatSend(input = k(`chat-input`)) {
@@ -7127,7 +7130,7 @@ function __chatSend(input = k(`chat-input`)) {
     __chatAdd(`System`, `Message not sent: the other player is disconnected.`, !1);
     return;
   }
-  ((__chatLastSend = now), __chatAdd(__myName() || `You`, text, !0), (input.value = ``));
+  ((__chatLastSend = now), __chatAdd(__myName() || `You`, text, !0, N ? `Host` : `Guest`), (input.value = ``));
   input.id === `chat-ov-input` && (input.blur(), k(`game-canvas`).focus());
 }
 function __chatOpen(on) {
