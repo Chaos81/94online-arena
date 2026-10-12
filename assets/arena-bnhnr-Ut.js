@@ -9377,3 +9377,13 @@ globalThis.__arenaReplay = {
     return __rp ? { i: __rp.i, n: __rp.n, done: __rp.done, hashes: __rp.hashes } : null;
   },
 };
+{
+  let wrap = k(`screen-wrap`),
+    idle = 0,
+    show = () => {
+      (wrap.classList.remove(`cursor-idle`), clearTimeout(idle));
+      idle = setTimeout(() => wrap.classList.add(`cursor-idle`), 2500);
+    };
+  for (let ev of [`pointermove`, `pointerdown`, `wheel`]) wrap.addEventListener(ev, show, { passive: !0 });
+  for (let ev of [`fullscreenchange`, `webkitfullscreenchange`]) document.addEventListener(ev, show);
+}
