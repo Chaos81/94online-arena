@@ -1,0 +1,55 @@
+ONLINE ARENA - PATCH v4 (boots the ROM from power-on)
+======================================================
+
+Contains the full "testing" folder (no ROMs). Replace your existing testing folder with it.
+
+RUN
+  From the folder that CONTAINS "testing":   python3 -m http.server 8000
+  Open http://localhost:8000/testing/
+
+PRE-GAME NOW HAS 3 STEPS
+  1. Choose your system (Genesis or SNES) and pick your ROM file from your computer.
+  2. Host online (3-letter room code) / join a friend's code / Local match.
+  3. Start. The emulator boots the ROM from the very beginning; teams, players, home/away and
+     rules are all chosen in the game's own menus.
+
+REMOVED
+  Single player / Two players, local Home / Away, "Choose your game", the Choose-the-matchup section,
+  Match rules, Locked game conditions, the scoreboard and team logos above the screen, the
+  result-share card, Save stats, and the author's "load a save" recovery panel.
+  The site no longer reads the game's memory (no menu automation, no rule checks, no scores),
+  so any ROM or ROM hack boots.
+
+ONLINE
+  The host chooses Player 1 (home) or Player 2 (away) with the side buttons; the guest gets the other port. Both players pick the same ROM file; as soon as they connect
+  their ROMs are compared by CRC32 and Start is blocked, with both values shown, if they differ.
+  SNES ROMs with and without a 512-byte copier header count as the same ROM.
+  The guest follows the host's system choice.
+
+SAVE STATES (Save state / Load state buttons, or [ and ])
+  Work for both systems, local and online (only the host loads; the guest is resynced).
+  Files are named after the ROM (nhl94.bin -> nhl94.state). They no longer check teams or settings.
+
+END GAME returns to setup (online: for both players).
+
+HEADER / FOOTER
+  Header image is testing/assets/header.gif (replace the file to change it). The nav has a link to
+  https://www.nhl94online.com. The intro block and the Enable-sound button are gone: sound starts
+  automatically on your first click or key press (browsers require one gesture). Footer reads
+  "NHL94Online.com Gaming".
+
+CONSOLE PICTURES
+  The idle game window shows testing/assets/console-genesis.svg or console-snes.svg. To use real
+  photos, save them as testing/assets/console-genesis.jpg and console-snes.jpg; the page uses a
+  .jpg automatically when it exists.
+
+NOTE: All minified JavaScript (game/core/gpgx.mjs, snes.mjs, assets/arena-*.js, assets/service-*.js, game/ramvars.js, game/snes-boot.js) has been reformatted for readability (one statement per line, indented). Behavior is unchanged.
+
+STABILITY: the diagnostics show "Stable (n ms)" or, when jitter is above 25 ms, an orange
+"High jitter (n ms)" with a tooltip noting this is common on Wi-Fi and that wired plays smoother.
+
+CHAT: during an online match a chat box appears under the Game Window. Messages (up to 200 characters)
+go straight to the other player over the same peer connection (nothing is stored on a server). It is
+hidden for local play and disappears on disconnect. Typing in it does not trigger game controls.
+Chat shortcut: press Tab to jump into the chat box and Tab (or Esc) to return to the game. Tab keeps
+its normal behavior when no online chat is open.

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Super Nintendo console and controller">
+<defs>
+<linearGradient id="b1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dcdce2"/><stop offset="1" stop-color="#a9a9b2"/></linearGradient>
+<linearGradient id="b2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bdbdc6"/><stop offset="1" stop-color="#8e8e99"/></linearGradient>
+<radialGradient id="sh" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+</defs>
+<ellipse cx="320" cy="300" rx="270" ry="30" fill="url(#sh)"/>
+<!-- console body -->
+<path d="M110 270 L110 168 Q110 150 128 148 L512 148 Q530 150 530 168 L530 270 Q530 282 518 282 L122 282 Q110 282 110 270Z" fill="url(#b1)" stroke="#6d6d78" stroke-width="2"/>
+<path d="M110 168 Q110 150 128 148 L512 148 Q530 150 530 168 L530 186 L110 186Z" fill="url(#b2)"/>
+<!-- cartridge slot -->
+<rect x="216" y="158" width="208" height="22" rx="5" fill="#35353d"/>
+<rect x="224" y="164" width="192" height="10" rx="3" fill="#18181c"/>
+<!-- controls -->
+<rect x="130" y="204" width="64" height="26" rx="6" fill="#8a8a96"/><rect x="138" y="212" width="22" height="10" rx="3" fill="#cfcfd8"/>
+<rect x="446" y="204" width="64" height="26" rx="6" fill="#8a8a96"/><rect x="452" y="210" width="52" height="14" rx="5" fill="#6d5fa8"/>
+<circle cx="214" cy="218" r="6" fill="#4a4a54"/><rect x="236" y="212" width="40" height="12" rx="4" fill="#9a9aa6"/>
+<rect x="300" y="236" width="40" height="30" rx="4" fill="#2c2c33"/><rect x="354" y="236" width="40" height="30" rx="4" fill="#2c2c33"/>
+<circle cx="170" cy="258" r="6" fill="#d93a2b"/>
+<!-- controller -->
+<path d="M214 292 Q262 264 330 264 Q398 264 446 292" fill="none" stroke="#3a3a42" stroke-width="5"/>
+<path d="M214 300 Q212 330 244 336 Q284 342 330 342 Q376 342 416 336 Q448 330 446 300 Q444 284 418 286 Q376 292 330 292 Q284 292 242 286 Q216 284 214 300Z" fill="url(#b1)" stroke="#6d6d78" stroke-width="2"/>
+<rect x="244" y="305" width="34" height="9" rx="2" fill="#2c2c33"/><rect x="256.5" y="292.5" width="9" height="34" rx="2" fill="#2c2c33"/>
+<circle cx="404" cy="300" r="7" fill="#7a6cc0"/><circle cx="388" cy="316" r="7" fill="#7a6cc0"/><circle cx="388" cy="298" r="7" fill="#b9b0e0"/><circle cx="372" cy="314" r="7" fill="#b9b0e0"/>
+<rect x="318" y="312" width="16" height="6" rx="3" fill="#6a6a75"/><rect x="340" y="312" width="16" height="6" rx="3" fill="#6a6a75"/>
+</svg>

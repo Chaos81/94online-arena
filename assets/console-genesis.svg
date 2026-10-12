@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Sega Genesis console and controller">
+<defs>
+<linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3a42"/><stop offset="1" stop-color="#16161a"/></linearGradient>
+<linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2b32"/><stop offset="1" stop-color="#0f0f12"/></linearGradient>
+<radialGradient id="sh" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+</defs>
+<ellipse cx="320" cy="300" rx="270" ry="30" fill="url(#sh)"/>
+<!-- console body -->
+<path d="M96 262 L96 214 Q96 200 110 196 L150 186 L172 146 Q176 138 186 138 L470 138 Q480 138 486 146 L514 186 L546 196 Q560 200 560 214 L560 262 Q560 276 546 276 L110 276 Q96 276 96 262Z" fill="url(#g1)" stroke="#000" stroke-width="2"/>
+<!-- top deck -->
+<path d="M178 150 L482 150 L506 186 L152 186Z" fill="url(#g2)"/>
+<rect x="196" y="160" width="150" height="12" rx="3" fill="#050506"/>
+<ellipse cx="418" cy="168" rx="58" ry="11" fill="#0a0a0c" stroke="#3b3b44" stroke-width="2"/>
+<ellipse cx="418" cy="168" rx="40" ry="7" fill="none" stroke="#2c2c33" stroke-width="2"/>
+<ellipse cx="418" cy="168" rx="22" ry="4" fill="none" stroke="#2c2c33" stroke-width="2"/>
+<!-- front panel -->
+<rect x="116" y="200" width="424" height="60" rx="8" fill="#101013"/>
+<rect x="140" y="222" width="86" height="12" rx="6" fill="#050506"/><rect x="150" y="224" width="26" height="8" rx="4" fill="#5b5b66"/>
+<circle cx="258" cy="228" r="5" fill="#d93a2b"/>
+<rect x="436" y="214" width="80" height="6" rx="3" fill="#2a2a31"/><rect x="436" y="228" width="80" height="6" rx="3" fill="#2a2a31"/><rect x="436" y="242" width="80" height="6" rx="3" fill="#2a2a31"/>
+<!-- controller -->
+<path d="M214 292 Q262 262 330 262 Q398 262 446 292" fill="none" stroke="#0e0e10" stroke-width="5"/>
+<path d="M232 292 Q224 318 252 330 Q284 340 330 340 Q376 340 408 330 Q436 318 428 292 Q420 278 396 282 Q360 292 330 292 Q300 292 264 282 Q240 278 232 292Z" fill="url(#g1)" stroke="#000" stroke-width="2"/>
+<rect x="258" y="298" width="36" height="9" rx="2" fill="#050506"/><rect x="271.5" y="284.5" width="9" height="36" rx="2" fill="#050506"/>
+<circle cx="352" cy="312" r="8" fill="#6a6a75"/><circle cx="378" cy="306" r="8" fill="#6a6a75"/><circle cx="402" cy="300" r="8" fill="#6a6a75"/>
+</svg>

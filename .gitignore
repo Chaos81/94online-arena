@@ -1,0 +1,13 @@
+# Never commit game ROMs or save states
+*.bin
+*.gen
+*.md.rom
+*.smd
+*.sfc
+*.smc
+*.state
+*.zip
+# OS / editor
+.DS_Store
+Thumbs.db
+node_modules/

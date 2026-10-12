@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script>window.__BASE=new URL("./",location.href).pathname;</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#101b31" />
+  <meta name="description" content="Online arena for classic hockey. Human opponents, free team selection, and connection testing." />
+  <title>Online Arena</title>
+  <script type="module" crossorigin src="./assets/arena-bnhnr-Ut.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/shared.js">
+  <link rel="stylesheet" crossorigin href="./assets/arena-Bwve1r6i.css">
+<style>.site-header{height:auto;min-height:0;padding-top:10px;padding-bottom:10px}.site-header .brand{flex:0 1 750px;min-width:0}.site-header .brand img{width:100%;max-width:750px;height:auto;display:block}.site-header nav{flex-shrink:0}.prototype-limits{margin-top:20px}@media(max-width:700px){.site-header{flex-wrap:wrap;justify-content:center}.site-header .brand{flex:1 1 100%}.site-header nav{flex-wrap:wrap;justify-content:center}}.game-overlay{flex-direction:column;gap:4px}.console-art{display:none;position:relative;z-index:1;width:min(82%,600px);max-height:68%;object-fit:contain}#arena[data-platform=genesis] .console-genesis,#arena[data-platform=snes] .console-snes{display:block}.screen-copy{padding:8px 25px}#game-message{font-size:15px;max-width:420px}.screen-tag{margin-top:12px}.workspace{margin-top:26px}#stat-transport.relayed{color:#b45309;font-weight:700}
+.volume-control{display:inline-flex;align-items:center;gap:.5rem;margin-left:.25rem}
+.volume-control input[type=range]{width:110px;accent-color:#2563eb;cursor:pointer}
+.volume-control output{min-width:3ch;font-size:.8rem;opacity:.8}
+.chat-box{margin:.75rem 0;border:1px solid #cbd5e1;border-radius:8px;background:#fff;overflow:hidden}
+.chat-box[hidden]{display:none}
+.chat-log{height:120px;overflow-y:auto;padding:.5rem .75rem;font-size:.9rem;line-height:1.35}
+.chat-msg{margin:.15rem 0;overflow-wrap:anywhere}
+.chat-msg strong{color:#475569}.chat-msg.mine strong{color:#2563eb}
+.chat-row{display:flex;gap:.5rem;padding:.5rem;border-top:1px solid #e2e8f0}
+.chat-row input{flex:1;min-width:0;padding:.45rem .6rem;border:1px solid #cbd5e1;border-radius:6px;font:inherit}
+</style></head>
+<body>
+  <a class="skip-link" href="#setup">Skip to match setup</a>
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="NHL ’94 Online"><img src="./assets/header.gif" width="750" height="147" alt="NHL ’94 Online · Gens &amp; SNES · Est. Fall 2005" /></a>
+    <nav aria-label="Main navigation"><a href="#arena" class="active">The arena</a><button id="help-open" class="nav-help" type="button" aria-haspopup="dialog" aria-controls="help-dialog"><span class="help-label-long">Help &amp; how-tos</span><span class="help-label-short">Help</span></button><a href="https://www.nhl94online.com" target="_blank" rel="noopener noreferrer">NHL94Online ↗</a></nav>
+    <span class="build-badge"><span class="status-dot"></span>EARLY PROTOTYPE</span>
+  </header>
+    <main>
+    <p id="browser-notice" class="browser-notice" role="alert" hidden></p>
+    
+        <div class="workspace" id="arena">
+      <section class="arena" aria-labelledby="arena-title">
+        <div class="arena-bar"><h2 id="arena-title">GAME WINDOW</h2><span id="session-status" role="status">NO GAME IN PROGRESS</span></div>
+        <div id="join-indicator" class="join-indicator" data-state="waiting" role="status" aria-live="polite" hidden><span class="join-dot" aria-hidden="true"></span><div><strong id="join-indicator-title">WAITING FOR OPPONENT</strong><p id="join-indicator-copy"></p></div></div>
+        <div id="controller-banner" class="controller-banner" role="status" hidden><p id="controller-banner-text"></p><div><button id="controller-banner-setup" type="button" class="button small">SET UP BUTTONS</button><button id="controller-banner-dismiss" type="button" class="text-button">Not now</button></div></div>
+                <div class="screen-wrap" id="screen-wrap">
+          <canvas id="game-canvas" width="320" height="224" tabindex="0" aria-label="Game screen. Keyboard and gamepad controls listed below."></canvas>
+          <div id="scanline-overlay" class="scanline-overlay" aria-hidden="true" hidden></div>
+          <button id="scanlines-in-game" class="scanlines-in-game" type="button" aria-pressed="false">Scanlines: off</button>
+          <button id="help-in-game" class="in-game-help" type="button" aria-haspopup="dialog" aria-controls="help-dialog">Help</button>
+          <button id="controller-in-game" class="in-game-controller" type="button">Controller</button>
+          <div id="fullscreen-hint" class="fullscreen-hint" hidden>Press Esc to exit full screen</div>
+          <div id="game-overlay" class="game-overlay">
+                        <img class="console-art console-genesis" src="./assets/console-genesis.jpg" alt="Sega Genesis" onerror="this.onerror=null;this.src='./assets/console-genesis.svg'" /><img class="console-art console-snes" src="./assets/console-snes.jpg" alt="Super Nintendo" onerror="this.onerror=null;this.src='./assets/console-snes.svg'" /><div class="screen-copy"><p id="game-message">Choose your system and ROM,<br />then host online or play locally.</p><span id="screen-tag" class="screen-tag">GENESIS</span></div>
+          </div>
+          <div id="cartridge-loader" class="cartridge-loader" role="status" aria-label="Game loading" hidden>
+            <header class="cartridge-header"><span class="cartridge-brand">ONLINE <b>ARENA</b><small>YOUR ROM. YOUR GAME.</small></span><span id="cartridge-console" class="cartridge-console">SEGA GENESIS</span></header>
+            <div class="cartridge-main" id="cartridge94-main">
+                            <div class="cartridge-copy"><span class="cartridge-eyebrow">16-BIT CLASSICS</span><h2>YOUR GAME.<br><em>YOUR ROM.</em></h2><p id="cartridge-description">Loaded from your own computer.<br>Played together online.</p><span class="cartridge-tournament">ONLINE ARENA</span></div>
+            </div>
+                        <div class="cartridge-footer"><div class="cartridge-status"><strong id="cartridge-stage">LOADING GAME</strong><span id="cartridge-percent">PLEASE WAIT</span></div><progress id="cartridge-progress" max="1" aria-label="Game loading progress"></progress><p id="cartridge-message">Getting your game ready for the ice.</p></div>
+          </div>
+          <div id="disc-loader" class="disc-loader" role="status" aria-label="Sega CD loading" hidden>
+            <img id="disc-loader-startup" class="disc-loader-startup" alt="Original US Sega CD startup screen" width="320" height="224">
+            <div class="disc-loader-brand"><span>THE CLASSIC DISC</span><strong>NHL <b>94</b></strong><small>WELCOME TO THE ICE.</small></div>
+            <div class="disc-loader-panel"><div class="disc-loader-heading"><strong id="disc-loader-stage">LOADING DISC</strong><span id="disc-loader-percent">0%</span></div><progress id="disc-loader-progress" max="1" value="0" aria-label="Sega CD loading progress"></progress><p id="disc-loader-copy">First visit: saving the disc on this device for faster return visits.</p><span class="disc-loader-led" aria-hidden="true"></span></div>
+          </div>
+          <!-- Keep this help menu current whenever a feature is added, changed or removed. See docs/help-menu.md. -->
+          <dialog id="help-dialog" class="help-dialog" aria-labelledby="help-title">
+            <header class="help-header"><div><p class="eyebrow">PLAYER’S MANUAL</p><h2 id="help-title">HELP &amp; HOW-TOS</h2></div><button id="help-close" class="button small" type="button" autofocus>DONE <span aria-hidden="true">×</span></button></header>
+            <div class="help-content">
+              <p class="help-intro">Everything you need to get in the game. Open any topic below.</p>
+              <p id="help-session-note" class="help-session-note" role="status">You can open Help before a game or during a session.</p>
+              <nav class="help-topics" aria-label="Help topics"><button type="button" data-help-topic="help-play">Start playing</button><button type="button" data-help-topic="help-teams">System &amp; ROM</button><button type="button" data-help-topic="help-controls">Controls</button><button type="button" data-help-topic="help-screen">Sound &amp; screen</button><button type="button" data-help-topic="help-save-states">Save states</button><button type="button" data-help-topic="help-connection">Connection help</button></nav>
+
+              <details id="help-play" class="help-topic" open><summary>Play in 3 easy steps</summary><div class="help-topic-body"><ol><li><strong>Choose your system and ROM.</strong> Pick Sega Genesis or Super Nintendo, then choose your ROM file from your computer. It is read in your browser and never uploaded.</li><li><strong>Choose how to play.</strong> For online play your room opens automatically: send your friend the three-character room code (or <strong>Copy link</strong>). To join, enter their code and choose <strong>Join</strong>. For a game on this computer choose <strong>Local match</strong>.</li><li><strong>Start.</strong> The game boots from the very beginning, exactly like a console. Use the game’s own menus to choose teams, one or two players, home or away and the rules. Online, the host chooses <strong>Start game</strong> and the guest chooses <strong>Ready to play</strong>.</li></ol><p>Online, the host chooses whether to be Player 1 (home) or Player 2 (away); the guest takes the other controller port. Both players must load the <strong>same ROM file</strong>.</p></div></details>
+
+              <details id="help-teams" class="help-topic"><summary>System &amp; ROM</summary><div class="help-topic-body"><p><strong>Systems:</strong> Sega Genesis and Super Nintendo. Each system needs its own ROM file. A loaded ROM is kept until you reload the page.</p><p><strong>Any ROM:</strong> the site does not check which game or version your ROM is. Hacks and custom ROMs are fine.</p><p><strong>Online:</strong> as soon as two players connect, both ROMs are compared by CRC32. If they differ, Start is blocked and both values are shown. SNES ROMs with or without a 512-byte copier header count as the same ROM.</p></div></details>
+
+              <details id="help-controls" class="help-topic"><summary>Controllers, remapping &amp; keyboard controls</summary><div class="help-topic-body">
+                <ol><li>Connect your controller and press a button so the browser can detect it.</li><li>Choose <strong>Set up controller</strong> in the ready check, or <strong>Controller</strong> below the game or in full screen. If prompted, choose the controller to map.</li><li>Press each requested direction and button, including <strong>Start</strong>. Use Back to correct a step. When finished, test your buttons and choose Done.</li></ol>
+                <p>You can remap in the lineup menu or mid-match without restarting. Layouts are saved in this browser for the controller and console. <strong>Start over</strong> remaps; <strong>Use standard layout</strong> removes your saved mapping. Private windows or blocked storage may keep a layout only for that visit.</p>
+                <p><strong>Online:</strong> agree on an in-game pause before opening Controller. Your inputs are held neutral while mapping; the online game keeps running. Local games pause while the panel is open.</p>
+                <h3>Keyboard · Genesis ’94 and ’95</h3>
+                <table class="help-keyboard"><caption class="step-digit">Genesis keyboard controls</caption><thead><tr><th scope="col">Action</th><th scope="col">Player 1 / online</th><th scope="col">Player 2 · local</th></tr></thead><tbody><tr><th scope="row">Move</th><td>Arrow keys</td><td><kbd>I</kbd> <kbd>K</kbd> <kbd>J</kbd> <kbd>L</kbd></td></tr><tr><th scope="row">Sega A / B / C</th><td><kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></td><td><kbd>Z</kbd> <kbd>X</kbd> <kbd>C</kbd></td></tr><tr><th scope="row">Start</th><td><kbd>Enter</kbd></td><td><kbd>Right Shift</kbd></td></tr></tbody></table>
+                <h3>Keyboard · SNES ’94</h3>
+                <table class="help-keyboard"><caption class="step-digit">SNES keyboard controls</caption><thead><tr><th scope="col">Action</th><th scope="col">Player 1 / online</th><th scope="col">Player 2 · local</th></tr></thead><tbody><tr><th scope="row">Move</th><td>Arrow keys</td><td><kbd>I</kbd> <kbd>K</kbd> <kbd>J</kbd> <kbd>L</kbd></td></tr><tr><th scope="row">SNES A / B</th><td><kbd>A</kbd> <kbd>S</kbd></td><td><kbd>Z</kbd> <kbd>X</kbd></td></tr><tr><th scope="row">Y / X (goalie)</th><td><kbd>Q</kbd> <kbd>W</kbd></td><td><kbd>U</kbd> <kbd>O</kbd></td></tr><tr><th scope="row">L / R</th><td><kbd>E</kbd> <kbd>R</kbd></td><td><kbd>N</kbd> <kbd>M</kbd></td></tr><tr><th scope="row">Start</th><td><kbd>Enter</kbd></td><td><kbd>Right Shift</kbd></td></tr></tbody></table>
+                <p>Click the game picture to return keyboard focus. Online players each use the Player 1 keyboard layout on their own device, even when playing Away.</p>
+              </div></details>
+
+              <details id="help-screen" class="help-topic"><summary>Sound, full screen, pause &amp; ending a game</summary><div class="help-topic-body">
+                <p><strong>Scanlines:</strong> choose Scanlines: off below the game or in full screen to turn on a subtle retro CRT effect. Choose it again to turn it off. It starts off each visit, works with all three games, and only changes your own picture.</p><p><strong>Sound:</strong> choose Enable sound. Browsers need a click before they can play audio. If you see Retry sound, try again; the game can continue without audio.</p>
+                <p><strong>Full screen:</strong> choose Full screen, press <kbd>F</kbd> with the game focused, or double-click the game. Press <kbd>Esc</kbd> to exit. Help, Controller and save-state buttons remain available in full screen. Browsers without native full screen use a page-filling view.</p>
+                <p><strong>Pause:</strong> the local Pause button freezes the local game. Online, the button sends Start to the original game; agree with your opponent before pausing. Your controller’s Start also works in menus, during play, and between periods.</p><p><strong>End game:</strong> stops the current game and returns to setup. Online, the host ends both games together; a guest can request it. Download a save state first if you want to continue later. <strong>Disconnect</strong> leaves the online room.</p>
+              </div></details>
+
+              <details id="help-save-states" class="help-topic"><summary>Save states</summary><div class="help-topic-body"><p>Use <strong>Save state</strong> any time a game is running to download a <code>.state</code> file, and <strong>Load state</strong> to go back to it. Keyboard: <kbd>[</kbd> saves, <kbd>]</kbd> loads. Works for Genesis and SNES.</p><ul><li><strong>Local:</strong> both buttons work during play. A state must be from the same system.</li><li><strong>Online:</strong> either player can save. Only the <strong>host</strong> can load. The host’s state is sent to the guest, both games pause for a moment, load it and carry on together.</li><li>If the transfer cannot finish, nothing changes and the game continues. Use the same ROM that made the state.</li></ul></div></details>
+
+              <details id="help-connection" class="help-topic"><summary>Connection problems, flicker &amp; browser help</summary><div class="help-topic-body">
+                <ul><li><strong>Can’t join?</strong> Recheck the three-character code or use the host’s invite link. Wait for the opponent-connected message. If the room has closed, have the host create a new room.</li><li><strong>Game won’t load?</strong> Make sure your ROM file is loaded and that you both use the same ROM. Check your network and any browser notice. Download available saves before refreshing. A desktop browser is recommended; if Safari or Edge fails, try an up-to-date Chrome browser and report the original error.</li><li><strong>Lag or repeated disconnects?</strong> Keep the game tab visible, use a wired connection where possible, close heavy downloads, and try without a VPN. Brief tab interruptions allow up to 30 seconds to return. Distance and network quality still affect play.</li><li><strong>Black flashes or flicker?</strong> Note the game, browser, device, period, and what was on screen. Copy the connection report and share it with the site team. Try the same game in local mode to see whether it also happens without an opponent.</li><li><strong>Disconnected mid-game?</strong> Follow Save &amp; recover above. Loading a state requires returning to setup and both players agreeing on the same save.</li></ul>
+                <h3>What the connection numbers mean</h3><p><strong>Round trip</strong> is the time to the opponent and back. <strong>Jitter</strong> is how much that timing varies. <strong>Rollback</strong> shows predicted frames; the game can correct earlier predictions as inputs arrive. <strong>Input delay</strong> is a small frame buffer selected from the connection test. <strong>Transport</strong> describes the connection path.</p>
+                <p>Choose <strong>Copy connection report</strong> beneath the game when available. Send it to the site team with your browser/device details and the problem you saw. Online play remains experimental; the diagnostics cannot promise a lag-free match.</p>
+              </div></details>
+
+                            <p class="help-small">Download any save states you want to keep before closing or refreshing the arena.</p>
+            </div>
+          </dialog>
+        </div>
+        <div class="arena-tools">
+          <p id="connection-status" role="status"><span class="status-dot muted"></span>Offline · ready for setup</p>
+          <div class="arena-actions">
+            <div class="arena-action-group" role="group" aria-labelledby="play-actions-label"><span id="play-actions-label" class="arena-action-label">PLAY &amp; CONTROLS</span><button id="help-toolbar" class="text-button" type="button" aria-haspopup="dialog" aria-controls="help-dialog">Help</button><button id="fullscreen-toggle" class="text-button" type="button" aria-pressed="false">Full screen</button><button id="controller-setup" class="text-button" type="button">Controller</button><button id="scanlines-toggle" class="button small" type="button" aria-pressed="false">Scanlines: off</button><button id="pause-match" class="text-button" type="button" disabled>Pause</button><span class="volume-control"><button id="volume-mute" class="text-button" type="button" aria-pressed="false" aria-label="Mute emulator sound">Volume</button><input id="volume-slider" type="range" min="0" max="100" step="1" value="100" aria-label="Emulator volume"><output id="volume-value" for="volume-slider">100%</output></span></div>
+            <div class="arena-action-group" role="group" aria-labelledby="save-actions-label"><span id="save-actions-label" class="arena-action-label">SAVE STATES</span><button id="load-state" class="text-button" type="button" hidden disabled>Load state</button></div>
+            <div class="arena-action-group" role="group" aria-labelledby="session-actions-label"><span id="session-actions-label" class="arena-action-label">MATCH &amp; ROOM</span><button id="return-select" class="text-button end-game-button" type="button" title="Stop the current game and return to setup" disabled>End game</button><button id="disconnect" class="text-button" type="button" title="Leave this online room" disabled>Disconnect</button></div>
+          </div>
+          <p class="arena-actions-help"></p>
+        </div>
+        <section id="chat-box" class="chat-box" aria-label="Chat with your opponent" hidden><div id="chat-log" class="chat-log" role="log" aria-live="polite"></div><div class="chat-row"><input id="chat-input" type="text" maxlength="200" autocomplete="off" placeholder="Press Tab to chat · Tab or Esc to return to the game" aria-label="Chat message"><button id="chat-send" class="button small" type="button">Send</button></div></section><dl class="diagnostics" aria-label="Live connection measurements"><div><dt>ROUND TRIP</dt><dd id="stat-ping">—<small>ms</small></dd></div><div><dt>JITTER</dt><dd id="stat-jitter">—<small>ms</small></dd></div><div><dt>ROLLBACK</dt><dd id="stat-rollback">—<small>frames</small></dd></div><div><dt>INPUT DELAY</dt><dd id="stat-delay">—<small>frames</small></dd></div><div><dt>STABILITY</dt><dd id="stat-nettype" class="transport">—</dd></div><div><dt>TRANSPORT</dt><dd id="stat-transport" class="transport">Not connected</dd></div></dl>
+        <p class="connection-note">Distance still matters. Keep the game tab visible during online play. Brief interruptions get up to 30 seconds to return. <button id="copy-connection-report" class="text-button" type="button" hidden>Copy connection report</button></p><pre id="connection-report" class="results-output" tabindex="0" hidden></pre>
+      </section>
+
+      <section class="setup-panel" id="setup" aria-labelledby="setup-title">
+        <div class="panel-title"><div><p>PRE-GAME</p><h2 id="setup-title">3 EASY STEPS</h2></div><span>LET’S PLAY</span></div>
+        <fieldset class="setup-step system-step"><legend><span class="step-number"><span class="step-digit">1</span><svg viewBox="0 0 5 7" aria-hidden="true" focusable="false" shape-rendering="crispEdges"><rect x="2" y="0" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="2" y="5" width="1" height="1"/><rect x="1" y="6" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></svg></span>Choose your system and ROM</legend><div class="platform-choice"><label for="platform-select" class="input-label">System</label><select id="platform-select" aria-describedby="platform-note"><option value="genesis">Sega Genesis</option><option value="snes">Super Nintendo</option></select><p id="platform-note" class="field-help"></p></div><section class="game-build-card" aria-labelledby="game-build-title"><div class="game-build-heading"><p>GAME ROM</p><span id="game-build-state">NEEDED</span></div><h3 id="game-build-title">Choose your ROM</h3><p id="rom-status" role="status">Pick the ROM file for this game from your computer. It never leaves your device, and any ROM is accepted.</p><label for="rom-file" class="input-label">ROM file (.bin .md .gen .smd .sfc .smc)</label><input id="rom-file" type="file" accept=".bin,.md,.gen,.smd,.sfc,.smc,.rom" /><p class="field-help">Online, both players need to load the same ROM file. The match will not start if the two ROMs differ.</p></section></fieldset>
+        <fieldset class="setup-step play-mode-step"><legend><span class="step-number"><span class="step-digit">2</span><svg viewBox="0 0 5 7" aria-hidden="true" focusable="false" shape-rendering="crispEdges"><rect x="1" y="0" width="1" height="1"/><rect x="2" y="0" width="1" height="1"/><rect x="3" y="0" width="1" height="1"/><rect x="0" y="1" width="1" height="1"/><rect x="4" y="1" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="1" y="5" width="1" height="1"/><rect x="0" y="6" width="1" height="1"/><rect x="1" y="6" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/><rect x="4" y="6" width="1" height="1"/></svg></span>Choose how to play</legend><p class="step-intro">Host online and share your three-character room code, join a friend’s code below, or play a local match on this computer.</p><div class="mode-buttons"><button id="host-mode" class="mode-button selected" aria-pressed="true"><strong>Host online</strong><span>Share a 3-letter code</span></button><button id="practice-mode" class="mode-button" aria-pressed="false"><strong>Local match</strong><span>Play on this computer</span></button></div><div class="join-divider"><span>OR JOIN A FRIEND</span></div><form id="join-form" class="join-form"><label for="room-code" class="input-label">Room code</label><div class="input-row"><input id="room-code" type="text" placeholder="ABC" inputmode="text" maxlength="3" autocomplete="off" spellcheck="false" aria-describedby="room-code-help" /><button id="join-room" type="submit" class="button small">JOIN</button></div><p id="room-code-help" class="field-help">Enter the three characters your host sent you.</p></form><div id="room-share" class="room-share" hidden><label for="room-link" class="input-label">Send this invite</label><div class="input-row"><input id="room-link" type="text" readonly /><button id="copy-room-link" class="button small" type="button">COPY LINK</button></div><p class="room-code-display">ROOM CODE <strong id="room-short-code"></strong><button id="copy-room-code" class="text-button" type="button">Copy code</button></p></div></fieldset>
+        <div id="side-assignment" class="side-assignment" hidden><span class="input-label">Your player side</span><div class="side-buttons" role="group" aria-label="Host player side"><button id="host-side-0" type="button" class="side-button selected" aria-pressed="true"><strong>PLAYER 1</strong><span>HOME</span></button><button id="host-side-1" type="button" class="side-button" aria-pressed="false"><strong>PLAYER 2</strong><span>AWAY</span></button></div><p id="side-assignment-copy" class="field-help"></p></div>
+        <section class="ready-check" aria-labelledby="ready-check-title"><span class="step-number"><span class="step-digit">3</span><svg viewBox="0 0 5 7" aria-hidden="true" focusable="false" shape-rendering="crispEdges"><rect x="0" y="0" width="1" height="1"/><rect x="1" y="0" width="1" height="1"/><rect x="2" y="0" width="1" height="1"/><rect x="3" y="0" width="1" height="1"/><rect x="4" y="1" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="4" y="5" width="1" height="1"/><rect x="0" y="6" width="1" height="1"/><rect x="1" y="6" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></svg></span><div><h3 id="ready-check-title">Get ready</h3><p id="ready-copy">Choose your system and ROM above.</p></div><strong id="ready-state">CHOOSE ROM</strong><button id="controller-before-play" class="text-button controller-shortcut" type="button" aria-haspopup="dialog" aria-controls="controller-dialog">Set up controller</button></section>
+        <button id="start-match" class="button start-button" aria-describedby="ready-copy setup-status" disabled>START GAME <span aria-hidden="true">→</span></button><p id="setup-status" class="field-help setup-status" role="status">Choose your system and ROM to begin. Online play is experimental.</p>
+      </section>
+    </div>
+
+                <details class="controls"><summary><span>Controller &amp; keyboard guide</span><span>Open guide <span aria-hidden="true">+</span></span></summary><div class="controls-grid"><div><h3>Player one</h3><p><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> Move<br /><kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> Sega A / B / C<br />SNES: <kbd>A</kbd> A · <kbd>S</kbd> B · <kbd>Q</kbd> Y · <kbd>W</kbd> X (goalie)<br /><kbd>E</kbd> L · <kbd>R</kbd> R<br /><kbd>Enter</kbd> Start / pause</p></div><div><h3>Player two · local</h3><p><kbd>I</kbd> <kbd>K</kbd> <kbd>J</kbd> <kbd>L</kbd> Move<br /><kbd>Z</kbd> <kbd>X</kbd> <kbd>C</kbd> Sega A / B / C<br />SNES: <kbd>Z</kbd> A · <kbd>X</kbd> B · <kbd>U</kbd> Y · <kbd>O</kbd> X (goalie)<br /><kbd>N</kbd> L · <kbd>M</kbd> R<br /><kbd>Right Shift</kbd> Start / pause</p></div><div><h3>Prefer a controller?</h3><p>Connect a gamepad and press a button. If the buttons feel wrong (common with 8BitDo and other Genesis-style pads), choose <strong>Controller</strong> at any time, including menus or mid-match and press each button once. Your layout is saved in this browser. For online games, agree on an in-game pause before mapping. Start works in the lineup, during play, and between periods. Press <kbd>F</kbd> or double-click the game for full screen. Desktop browser recommended.</p></div></div></details>
+
+    
+    
+    <section class="test-lab" aria-labelledby="test-title"><div><p class="eyebrow">03 / PROVE IT BEFORE PUCK DROP</p><h2 id="test-title">PUT THE NETWORK<br />THROUGH ITS PACES.</h2></div><div><p>Simulate delay, jitter, and packet loss to check the synchronization logic. A simulation is a first check; real Canada–Europe matches are still required.</p><button id="run-simulator" class="button secondary">Run network simulation <span aria-hidden="true">→</span></button></div><pre id="test-results" class="results-output" role="status" hidden></pre></section>
+  </main>
+  <footer><span class="footer-brand">NHL94Online.com Gaming</span><p><a href="https://github.com/ekeeke/Genesis-Plus-GX">Genesis license</a> · <a href="https://github.com/ekeeke/Genesis-Plus-GX">Genesis source</a> · <a href="https://github.com/libretro/snes9x2010">SNES license</a> · <a href="https://github.com/libretro/snes9x2010">SNES source</a></p></footer>
+  <dialog id="controller-dialog" class="controller-dialog" aria-labelledby="controller-dialog-title">
+    <h2 id="controller-dialog-title">Controller setup</h2>
+    <p id="controller-session-note" class="field-help" role="status"></p>
+    <p class="controller-device"><span>CONTROLLER</span> <strong id="controller-name">No controller detected</strong></p>
+    <div id="controller-picker" hidden><label for="controller-select" class="input-label">Choose the controller to map</label><select id="controller-select"></select></div>
+    <p id="controller-prompt" class="controller-prompt" role="status" aria-live="polite">Press any button on your controller so the browser can see it.</p>
+    <ol id="controller-steps" class="controller-steps" aria-label="Game buttons and controller mappings"></ol>
+    <div class="controller-actions"><button id="controller-back" type="button" class="text-button" hidden>Back</button><button id="controller-skip" type="button" class="text-button" hidden>Skip this button</button><button id="controller-remap" type="button" class="text-button" hidden>Set up buttons</button><button id="controller-reset" type="button" class="text-button" hidden>Use standard layout</button><button id="controller-close" type="button" class="button small">DONE</button></div>
+    <p class="field-help">Your layout is saved in this browser for this controller. Keyboard controls are not affected.</p>
+  </dialog>
+  <script src="./browser-check.js"></script>
+  <script type="module" src="./savestate.js"></script>
+<script>
+(function(){
+  var sl=document.getElementById('volume-slider'),mu=document.getElementById('volume-mute'),out=document.getElementById('volume-value');
+  if(!sl)return;
+  function ready(){return typeof globalThis.__setEmuVolume==='function'}
+  function paint(v,m){sl.value=Math.round(v*100);out.textContent=m?'Muted':Math.round(v*100)+'%';mu.setAttribute('aria-pressed',m?'true':'false');mu.textContent=m||v===0?'Muted':'Volume'}
+  function init(){
+    if(!ready())return setTimeout(init,200);
+    var s=globalThis.__getEmuVolume();paint(s.volume,s.muted);
+  }
+  sl.addEventListener('input',function(){if(!ready())return;var v=sl.value/100;globalThis.__setEmuVolume(v,false);paint(v,false)});
+  mu.addEventListener('click',function(){if(!ready())return;var s=globalThis.__getEmuVolume();var m=!s.muted;if(!m&&s.volume===0)globalThis.__setEmuVolume(0.5,false);globalThis.__setEmuVolume(globalThis.__getEmuVolume().volume,m);var n=globalThis.__getEmuVolume();paint(n.volume,n.muted)});
+  init();
+})();
+</script>
+</body>
+</html>
