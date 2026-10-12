@@ -6668,7 +6668,12 @@ function fi(e) {
         throw Error(`Invalid ROM info.`);
       break;
     case `arena-chat`:
-      if (typeof e.text != `string` || e.text.length < 1 || e.text.length > 200)
+      if (
+        typeof e.text != `string` ||
+        e.text.length < 1 ||
+        e.text.length > 200 ||
+        (e.name !== void 0 && (typeof e.name != `string` || e.name.length > 40))
+      )
         throw Error(`Invalid chat message.`);
       break;
     case `arena-leave`:
@@ -7099,11 +7104,17 @@ function __ovShow() {
     document.activeElement !== k(`chat-ov-input`) && w.classList.remove(`chat-active`);
   }, 8e3);
 }
-function __chatReceive(text) {
+function __cleanName(n) {
+  return String(n ?? ``).replace(/[\u0000-\u001f\u007f]/g, ` `).replace(/\s+/g, ` `).trim().slice(0, 20);
+}
+function __myName() {
+  return __cleanName(k(`player-name`).value);
+}
+function __chatReceive(text, name) {
   let now = performance.now();
   __chatTimes = __chatTimes.filter((t) => now - t < 5e3);
   if (__chatTimes.length >= 8) return;
-  (__chatTimes.push(now), __chatAdd(`Opponent`, text.replace(/[\u0000-\u001f\u007f]/g, ` `), !1));
+  (__chatTimes.push(now), __chatAdd(__cleanName(name) || `Opponent`, text.replace(/[\u0000-\u001f\u007f]/g, ` `), !1));
   document.hidden && Xa(`New chat message`);
 }
 function __chatSend(input = k(`chat-input`)) {
@@ -7111,12 +7122,12 @@ function __chatSend(input = k(`chat-input`)) {
     now = performance.now();
   if (!text || now - __chatLastSend < 400) return;
   try {
-    X({ t: `arena-chat`, text });
+    X({ t: `arena-chat`, text, name: __myName() });
   } catch {
     __chatAdd(`System`, `Message not sent: the other player is disconnected.`, !1);
     return;
   }
-  ((__chatLastSend = now), __chatAdd(`You`, text, !0), (input.value = ``));
+  ((__chatLastSend = now), __chatAdd(__myName() || `You`, text, !0), (input.value = ``));
   input.id === `chat-ov-input` && (input.blur(), k(`game-canvas`).focus());
 }
 function __chatOpen(on) {
@@ -8215,7 +8226,7 @@ async function ko(e, t = R) {
       return;
     }
     if (t.t === `arena-chat`) {
-      __chatReceive(t.text);
+      __chatReceive(t.text, t.name);
       return;
     }
     if (t.t.startsWith(`arena-state-`)) {
@@ -9405,4 +9416,16 @@ globalThis.__arenaReplay = {
     };
   for (let ev of [`pointermove`, `pointerdown`, `wheel`]) wrap.addEventListener(ev, show, { passive: !0 });
   for (let ev of [`fullscreenchange`, `webkitfullscreenchange`]) document.addEventListener(ev, show);
+}
+{
+  let nameEl = k(`player-name`);
+  try {
+    nameEl.value = __cleanName(localStorage.getItem(`nhl94online-name`));
+  } catch {}
+  nameEl.addEventListener(`input`, () => {
+    try {
+      localStorage.setItem(`nhl94online-name`, __myName());
+    } catch {}
+  });
+  nameEl.addEventListener(`keydown`, (e) => e.stopPropagation());
 }

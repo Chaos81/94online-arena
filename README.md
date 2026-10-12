@@ -26,6 +26,7 @@ Open <http://localhost:8000/>. Any static web host works (it also runs from a su
 - Save and load states (`.state`, named after the ROM); online, only the host loads and the guest resyncs
 - Direct vs TURN-relay indicator, ping / jitter / input-delay diagnostics, high-jitter notice
 - Emulator volume slider and mute
+- Username field (saved in the browser) shown next to your chat messages
 - Online chat (Tab to jump to the chat box; in full screen, messages appear as an overlay and Tab opens a message line)
 - Replays: **Save replay** records every button press by frame (both players, local or online) into a
   small `.replay` file; **Watch replay** plays it back exactly by booting the same ROM from power-on.
