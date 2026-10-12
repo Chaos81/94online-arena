@@ -53,3 +53,9 @@ go straight to the other player over the same peer connection (nothing is stored
 hidden for local play and disappears on disconnect. Typing in it does not trigger game controls.
 Chat shortcut: press Tab to jump into the chat box and Tab (or Esc) to return to the game. Tab keeps
 its normal behavior when no online chat is open.
+
+REPLAYS: Save replay (Play & Controls) downloads a .replay file for the current or last game: the ROM's
+CRC32, and every controller input for both players by frame (run-length encoded), plus any save states
+loaded during the game. Watch replay (setup screen, local mode, ROM loaded) boots that ROM from power-on and
+feeds the recorded inputs, so the game plays out exactly as it did. Online, only confirmed inputs are
+recorded, so rollbacks do not affect the file.

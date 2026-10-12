@@ -27,6 +27,11 @@ Open <http://localhost:8000/>. Any static web host works (it also runs from a su
 - Direct vs TURN-relay indicator, ping / jitter / input-delay diagnostics, high-jitter notice
 - Emulator volume slider and mute
 - Online chat (Tab to jump to the chat box)
+- Replays: **Save replay** records every button press by frame (both players, local or online) into a
+  small `.replay` file; **Watch replay** plays it back exactly by booting the same ROM from power-on.
+  Online matches record only inputs both sides have confirmed, so rollback corrections never end up in the file.
+  Loading a save state mid-game is stored in the replay too. A replay only plays with the same ROM
+  (CRC32) and emulator build it was recorded with.
 
 See the notes in `docs/CHANGES.txt` for the full change history.
 

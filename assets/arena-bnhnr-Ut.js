@@ -6221,6 +6221,27 @@ var Kr = class {
     setReason(e) {
       !this.reason && Ur.includes(e) && (this.reason = e);
     }
+    export(t = null, min = 60) {
+      if (this.frames < min) return null;
+      let r = this.meta;
+      return {
+        v: 1,
+        matchId: r.matchId,
+        side: r.side,
+        mode: r.mode,
+        started: r.started,
+        frames: this.frames,
+        config: r.config,
+        coreHash: r.coreHash,
+        startStateHash: r.startStateHash,
+        startState: r.startState || null,
+        romCrc: r.romCrc,
+        romName: r.romName,
+        reason: this.reason,
+        inputs: Gr(this.runs),
+        net: t,
+      };
+    }
     finish(e, t = null, n = new Date()) {
       if (
         this.finished ||
@@ -6243,6 +6264,9 @@ var Kr = class {
         coreHash: r.coreHash,
         rollbackVersion: r.rollbackVersion,
         startStateHash: r.startStateHash,
+        startState: r.startState || null,
+        romCrc: r.romCrc,
+        romName: r.romName,
         inputs: Gr(this.runs),
         result: this.score,
         net: t,
@@ -7618,7 +7642,9 @@ function co(e = !1) {
   }
   try {
     let r = t.finish(ra || `ended`, n);
-    r &&
+    ((__lastSegs = [...__segs, t.export(n, 1)].filter(Boolean)),
+      (__segs = []),
+      r) &&
       (la.submit(r, { unloading: e }),
       ua
         .submit(r)
@@ -7632,6 +7658,7 @@ function co(e = !1) {
 function lo() {
   (Ia(ra || `left`),
     co(),
+    (__rp = null),
     (ra = null),
     (Ea = null),
     Oa++,
@@ -7896,7 +7923,11 @@ async function yo(e) {
         coreHash: Ui,
         rollbackVersion: Cr,
         startStateHash: na,
+        romCrc: __myRom()?.crc,
+        romName: __romNames.get(z.platform) || ``,
       })),
+      (__segs = []),
+      await __rpApply(),
       Y(`Starting your game from power-on.`),
       M === `online`)
     ) {
@@ -8125,7 +8156,18 @@ function Oo(e) {
             n = (bi.mask(0) | (Bi > 0 ? 8 : 0)) & t,
             r;
           if (M === `online`) r = I.advance(n);
-          else {
+          else if (__rp) {
+            if (__rp.i >= __rp.n) (__rpDone(), (r = !1));
+            else {
+              (__rp.loads[__rp.i] && F.load(__rp.loads[__rp.i]),
+                F.step(__rp.p1[__rp.i], __rp.p2[__rp.i]),
+                __rp.i++,
+                __rp.i % 120 === 0 && (__rp.hashes[__rp.i] = F.checksum() >>> 0),
+                __rp.i % 30 === 0 &&
+                  (k(`connection-status`).textContent = `Replay · frame ${__rp.i} of ${__rp.n}`),
+                (r = !0));
+            }
+          } else {
             let e = $i === `single` ? 0 : bi.mask(1) & t;
             (F.step(n, e), so(ta?.frames, n, e), (r = !0));
           }
@@ -9126,7 +9168,7 @@ globalThis.__arena = Object.freeze({
       (Bi = 0),
       (Ii = null),
       (Li = 0),
-      (ta = null),
+      __restartRecording(),
       bi.held.clear());
     try {
       To();
@@ -9157,3 +9199,181 @@ addEventListener(
 k(`chat-input`).addEventListener(`keydown`, (e) => {
   e.key === `Escape` && (e.preventDefault(), e.target.blur(), k(`game-canvas`).focus());
 });
+var __rp = null,
+  __segs = [],
+  __lastSegs = null;
+function __restartRecording() {
+  let old = ta;
+  if (__rp || !old) {
+    ta = null;
+    return;
+  }
+  let seg = old.export(null, 1);
+  seg && __segs.push(seg);
+  ta = null;
+  try {
+    let st = F.save();
+    ta = new Kr({
+      ...old.meta,
+      startState: { bytes: new Uint8Array(st.bytes), frame: st.frame },
+      startStateHash: null,
+    });
+  } catch (e) {
+    console.error(`Could not restart recording`, e);
+  }
+}
+async function __rpApply() {
+  if (!__rp) return;
+  ta = null;
+  if (__rp.startHash && na !== __rp.startHash) {
+    __rp = null;
+    throw Error(`This replay does not match your ROM or emulator build, so it cannot be played back.`);
+  }
+}
+function __rpDone() {
+  if (__rp.done) return;
+  __rp.done = !0;
+  Y(`Replay finished. Choose End game to return to setup.`);
+  k(`connection-status`).textContent = `Replay finished · ${__rp.n} frames`;
+}
+function __b64(u8) {
+  let out = ``;
+  for (let i = 0; i < u8.length; i += 32768)
+    out += String.fromCharCode.apply(null, u8.subarray(i, i + 32768));
+  return btoa(out);
+}
+function __unb64(s) {
+  let bin = atob(s),
+    u8 = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  return u8;
+}
+async function __pipe(u8, stream) {
+  return new Uint8Array(
+    await new Response(new Blob([u8]).stream().pipeThrough(stream)).arrayBuffer(),
+  );
+}
+async function __saveReplay() {
+  let segs = ta ? [...__segs, ta.export(null, 1)].filter(Boolean) : __lastSegs || [],
+    total = segs.reduce((a, g) => a + g.frames, 0);
+  if (total < 60) {
+    Y(`Nothing to save yet. Play at least a second of a game first.`);
+    return;
+  }
+  try {
+    let head = segs[0],
+      out = [];
+    for (let g of segs) {
+      let state = null;
+      if (g.startState)
+        state = {
+          frame: g.startState.frame,
+          data: __b64(await __pipe(g.startState.bytes, new CompressionStream(`gzip`))),
+        };
+      out.push({ frames: g.frames, inputs: g.inputs, startState: state });
+    }
+    let obj = {
+      format: `NHL94-REPLAY`,
+      v: 2,
+      created: new Date().toISOString(),
+      platform: head.config?.platform || z.platform,
+      rom: { crc: head.romCrc || null, name: head.romName || `` },
+      coreHash: head.coreHash || null,
+      startHash: head.startStateHash || null,
+      mode: head.mode,
+      side: head.side,
+      net: segs[segs.length - 1].net || null,
+      frames: total,
+      segments: out,
+    };
+    let base = (head.romName || `nhl94`).replace(/\.[^.]*$/, ``).replace(/[^\w.-]+/g, `_`) || `nhl94`,
+      d = new Date(),
+      p2 = (n) => String(n).padStart(2, `0`),
+      stamp = `${d.getFullYear()}${p2(d.getMonth() + 1)}${p2(d.getDate())}-${p2(d.getHours())}${p2(d.getMinutes())}`,
+      a = document.createElement(`a`);
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(obj)], { type: `application/json` }));
+    a.download = `${base}-${stamp}.replay`;
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 6e4);
+    Y(`Replay saved (${(total / 60).toFixed(0)} seconds, ${total} frames).`);
+  } catch (e) {
+    Y(`Could not save the replay: ${e.message}`);
+  }
+}
+async function __watchReplay(file) {
+  try {
+    if (j !== `lobby` || M !== `local`) throw Error(`Return to setup and leave any online room before watching a replay.`);
+    if (file.size > 3e7) throw Error(`That file is too large to be a replay.`);
+    let obj = JSON.parse(await file.text());
+    if (obj?.format !== `NHL94-REPLAY` || obj.v !== 2 || !Array.isArray(obj.segments) || obj.segments.length > 200)
+      throw Error(`This is not a replay file from this site.`);
+    if (!Number.isSafeInteger(obj.frames) || obj.frames < 1 || obj.frames > 4e5)
+      throw Error(`The replay file is damaged.`);
+    if (obj.platform !== z.platform)
+      throw Error(`This replay is for ${{ genesis: `Sega Genesis`, snes: `Super Nintendo` }[obj.platform] || obj.platform}. Switch the system and load that ROM first.`);
+    if (!P) throw Error(`Load your ROM first, then choose the replay.`);
+    let me = __myRom();
+    if (obj.rom?.crc && me.crc !== obj.rom.crc)
+      throw Error(`This replay was recorded with a different ROM (CRC32 ${obj.rom.crc}; yours is ${me.crc}).`);
+    if (obj.coreHash && Ui && obj.coreHash !== Ui)
+      throw Error(`This replay was recorded with a different emulator build.`);
+    let p1 = new Uint16Array(obj.frames),
+      p2 = new Uint16Array(obj.frames),
+      loads = {},
+      n = 0;
+    for (let g of obj.segments) {
+      if (typeof g?.inputs != `string` || !Number.isSafeInteger(g.frames) || g.frames < 1)
+        throw Error(`The replay file is damaged.`);
+      if (g.startState)
+        loads[n] = {
+          frame: g.startState.frame,
+          bytes: await __pipe(__unb64(g.startState.data), new DecompressionStream(`gzip`)),
+        };
+      let m = 0;
+      for (let run of g.inputs.split(` `)) {
+        let [a, b, c] = run.split(`.`),
+          x = parseInt(a, 16),
+          y = parseInt(b, 16),
+          len = parseInt(c, 36);
+        if (!(x >= 0 && x <= 4095 && y >= 0 && y <= 4095 && len >= 1) || m + len > g.frames || n + len > obj.frames)
+          throw Error(`The replay file is damaged.`);
+        p1.fill(x, n, n + len);
+        p2.fill(y, n, n + len);
+        n += len;
+        m += len;
+      }
+      if (m !== g.frames) throw Error(`The replay file is damaged.`);
+    }
+    if (n !== obj.frames) throw Error(`The replay file is damaged.`);
+    __rp = { n, p1, p2, loads, i: 0, startHash: obj.segments[0]?.startState ? null : obj.startHash || null, done: !1, hashes: {} };
+    Y(`Starting replay…`);
+    await So();
+    if (j === `lobby`) __rp = null;
+  } catch (e) {
+    __rp = null;
+    Y(e.message || String(e));
+  }
+}
+function __replayUi() {
+  let sv = k(`replay-save`),
+    wt = k(`replay-watch`);
+  sv.disabled = !((ta && __segs.reduce((a, g) => a + g.frames, ta.frames) >= 60) || __lastSegs);
+  wt.disabled = !(j === `lobby` && M === `local` && P && !G && !K);
+}
+k(`replay-save`).addEventListener(`click`, __saveReplay);
+k(`replay-watch`).addEventListener(`click`, () => k(`replay-file`).click());
+k(`replay-file`).addEventListener(`change`, (e) => {
+  let f = e.target.files[0];
+  ((e.target.value = ``), f && __watchReplay(f));
+});
+setInterval(__replayUi, 700);
+globalThis.__arenaReplay = {
+  get frames() {
+    return ta?.frames ?? 0;
+  },
+  get playback() {
+    return __rp ? { i: __rp.i, n: __rp.n, done: __rp.done, hashes: __rp.hashes } : null;
+  },
+};
