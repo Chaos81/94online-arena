@@ -115,6 +115,7 @@
             </div>
           </dialog>
         </div>
+        <section id="chat-box" class="chat-box" aria-label="Chat with your opponent" hidden><div id="chat-log" class="chat-log" role="log" aria-live="polite"></div><div class="chat-row"><input id="chat-input" type="text" maxlength="200" autocomplete="off" placeholder="Press Tab to chat · Tab or Esc to return to the game" aria-label="Chat message"><button id="chat-send" class="button small" type="button">Send</button></div></section>
         <div class="arena-tools">
           <p id="connection-status" role="status"><span class="status-dot muted"></span>Offline · ready for setup</p>
           <div class="arena-actions">
@@ -124,7 +125,7 @@
           </div>
           <p class="arena-actions-help"></p>
         </div>
-        <section id="chat-box" class="chat-box" aria-label="Chat with your opponent" hidden><div id="chat-log" class="chat-log" role="log" aria-live="polite"></div><div class="chat-row"><input id="chat-input" type="text" maxlength="200" autocomplete="off" placeholder="Press Tab to chat · Tab or Esc to return to the game" aria-label="Chat message"><button id="chat-send" class="button small" type="button">Send</button></div></section><dl class="diagnostics" aria-label="Live connection measurements"><div><dt>ROUND TRIP</dt><dd id="stat-ping">—<small>ms</small></dd></div><div><dt>JITTER</dt><dd id="stat-jitter">—<small>ms</small></dd></div><div><dt>ROLLBACK</dt><dd id="stat-rollback">—<small>frames</small></dd></div><div><dt>INPUT DELAY</dt><dd id="stat-delay">—<small>frames</small></dd></div><div><dt>STABILITY</dt><dd id="stat-nettype" class="transport">—</dd></div><div><dt>TRANSPORT</dt><dd id="stat-transport" class="transport">Not connected</dd></div></dl>
+        <dl class="diagnostics" aria-label="Live connection measurements"><div><dt>ROUND TRIP</dt><dd id="stat-ping">—<small>ms</small></dd></div><div><dt>JITTER</dt><dd id="stat-jitter">—<small>ms</small></dd></div><div><dt>ROLLBACK</dt><dd id="stat-rollback">—<small>frames</small></dd></div><div><dt>INPUT DELAY</dt><dd id="stat-delay">—<small>frames</small></dd></div><div><dt>STABILITY</dt><dd id="stat-nettype" class="transport">—</dd></div><div><dt>TRANSPORT</dt><dd id="stat-transport" class="transport">Not connected</dd></div></dl>
         <p class="connection-note">Distance still matters. Keep the game tab visible during online play. Brief interruptions get up to 30 seconds to return. <button id="copy-connection-report" class="text-button" type="button" hidden>Copy connection report</button></p><pre id="connection-report" class="results-output" tabindex="0" hidden></pre>
       </section>
 
