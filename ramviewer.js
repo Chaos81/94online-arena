@@ -83,7 +83,10 @@
     '.rv{font:13px/1.35 Arial,Helvetica,sans-serif;color:#101b31}' +
     '.rv form{display:flex;flex-wrap:wrap;gap:.4rem;margin:.4rem 0}' +
     '.rv input,.rv select,.rv button{font:inherit;padding:.3rem .45rem;border:1px solid #cbd5e1;border-radius:5px;background:#fff}' +
-    '.rv input.addr{width:9.5em}.rv input.lbl{width:7em}' +
+    '.rv input,.rv select,.rv button{height:auto;min-height:0;margin:0;box-sizing:border-box}' +
+    '.rv input.addr{flex:1 1 8em;min-width:0;width:auto}.rv input.lbl{flex:1 1 6em;min-width:0;width:auto}.rv select{flex:1 1 7em;min-width:0}' +
+    '.rv input[type=checkbox]{width:auto;height:auto;padding:0;margin:0 .2rem 0 0;vertical-align:middle}.rv label{display:inline-flex;align-items:center}' +
+    '.rv form{align-items:center}' +
     '.rv button{cursor:pointer}.rv button:hover{background:#eef2f7}' +
     '.rv .err{color:#b91c1c;min-height:1.2em;margin:0 0 .3rem}' +
     '.rv table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}' +
@@ -91,7 +94,7 @@
     '.rv th{font-size:.8em;color:#657080;font-weight:700;letter-spacing:.04em}' +
     '.rv td.num{font-family:ui-monospace,Menlo,Consolas,monospace}' +
     '.rv .chg{background:#fde68a}.rv .empty{color:#657080;padding:.5rem 0}' +
-    '.rv pre{margin:.3rem 0;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;overflow-x:auto}' +
+    '.rv pre{margin:.3rem 0;font:11px/1.5 ui-monospace,Menlo,Consolas,monospace;overflow-x:auto}' +
     '.rv pre b{background:#fde68a;font-weight:400}.rv h4{margin:.8rem 0 .2rem;font-size:.85em;letter-spacing:.04em;color:#657080}' +
     '.rv .x{border:0;background:none;color:#657080;padding:0 .3rem}.rv .tools{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;margin:.3rem 0}';
 
@@ -207,13 +210,12 @@
       state.prev.dump = bytes2;
       state.targets.forEach(function (t) {
         var d = t.dump; d.textContent = '';
-        for (var row = 0; row < DUMP_BYTES / 16; row++) {
-          d.appendChild(t.doc.createTextNode('$' + hex(start + row * 16, 6) + '  '));
-          for (var i = 0; i < 16; i++) {
-            var idx = row * 16 + i, s = hex(bytes2[idx], 2);
+        for (var row = 0; row < DUMP_BYTES / 8; row++) {
+          d.appendChild(t.doc.createTextNode('$' + hex(start + row * 8, 6) + '  '));
+          for (var i = 0; i < 8; i++) {
+            var idx = row * 8 + i, s = hex(bytes2[idx], 2);
             if (old && old[idx] !== bytes2[idx]) { var b = t.doc.createElement('b'); b.textContent = s; d.appendChild(b); d.appendChild(t.doc.createTextNode(' ')); }
             else d.appendChild(t.doc.createTextNode(s + ' '));
-            if (i === 7) d.appendChild(t.doc.createTextNode(' '));
           }
           d.appendChild(t.doc.createTextNode('\n'));
         }

@@ -27,6 +27,7 @@ Open <http://localhost:8000/>. Any static web host works (it also runs from a su
 - Direct vs TURN-relay indicator, ping / jitter / input-delay diagnostics, high-jitter notice
 - Emulator volume slider and mute
 - Username field (saved in the browser) shown next to your chat messages, with a Host or Guest tag
+- Setup panel collapses when a game starts (Show setup button brings it back); RAM viewer lives beneath it in the sidebar
 - RAM viewer: type work-RAM addresses (or NHL '94 Genesis variable names) to watch live values and a 128-byte dump while playing; read-only, works in a separate window too
 - Online chat (Tab to jump to the chat box; in full screen, messages appear as an overlay and Tab opens a message line)
 - Replays: **Save replay** records every button press by frame (both players, local or online) into a
