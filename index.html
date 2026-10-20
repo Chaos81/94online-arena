@@ -36,8 +36,7 @@
 .field-help-inline{font-weight:400;opacity:.7;font-size:.85em}
 .chat-tag{font-style:normal;font-size:.72em;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 5px;border-radius:3px;background:#e2e8f0;color:#334155;vertical-align:1px}
 .chat-ov-log .chat-tag{background:rgba(255,255,255,.2);color:#fff}
-.ram-viewer{margin:.75rem 0;border:1px solid #cbd5e1;border-radius:8px;background:#fff}.ram-viewer>summary{cursor:pointer;padding:.55rem .75rem;font-weight:700}.ram-viewer-inner{padding:0 .75rem .75rem}.ram-viewer code{background:#f1f5f9;padding:0 3px;border-radius:3px}
-.setup-panel.setup-collapsed>:not(.panel-title):not(.ram-viewer){display:none}.setup-panel.setup-collapsed .panel-title{margin-bottom:12px}.setup-panel .ram-viewer{margin-bottom:0}.setup-toggle{margin-left:auto}
+.setup-panel.setup-collapsed>:not(.panel-title){display:none}.setup-panel.setup-collapsed .panel-title{margin-bottom:12px}.setup-toggle{margin-left:auto}
 </style></head>
 <body>
   <a class="skip-link" href="#setup">Skip to match setup</a>
@@ -122,6 +121,7 @@
           <p id="connection-status" role="status"><span class="status-dot muted"></span>Offline · ready for setup</p>
           <div class="arena-actions">
             <div class="arena-action-group" role="group" aria-labelledby="play-actions-label"><span id="play-actions-label" class="arena-action-label">PLAY &amp; CONTROLS</span><button id="help-toolbar" class="text-button" type="button" aria-haspopup="dialog" aria-controls="help-dialog">Help</button><button id="fullscreen-toggle" class="text-button" type="button" aria-pressed="false">Full screen</button><button id="controller-setup" class="text-button" type="button">Controller</button><button id="scanlines-toggle" class="button small" type="button" aria-pressed="false">Scanlines: off</button><button id="pause-match" class="text-button" type="button" disabled>Pause</button><button id="replay-save" class="text-button" type="button" disabled title="Download a replay of this game">Save replay</button><button id="replay-watch" class="text-button" type="button" disabled title="Play back a saved replay">Watch replay</button><input id="replay-file" type="file" accept=".replay,application/json" hidden><span class="volume-control"><button id="volume-mute" class="text-button" type="button" aria-pressed="false" aria-label="Mute emulator sound">Volume</button><input id="volume-slider" type="range" min="0" max="100" step="1" value="100" aria-label="Emulator volume"><output id="volume-value" for="volume-slider">100%</output></span></div>
+            <div class="arena-action-group" role="group" aria-labelledby="emu-actions-label"><span id="emu-actions-label" class="arena-action-label">EMULATOR CONTROL</span><button id="emu-reset" class="text-button" type="button" disabled title="Restart the game from power-on (local games only)">Reset emulator</button><button id="ram-open" class="text-button" type="button" title="Open the RAM viewer in a separate window">RAM viewer</button></div>
             <div class="arena-action-group" role="group" aria-labelledby="save-actions-label"><span id="save-actions-label" class="arena-action-label">SAVE STATES</span><button id="load-state" class="text-button" type="button" hidden disabled>Load state</button></div>
             <div class="arena-action-group" role="group" aria-labelledby="session-actions-label"><span id="session-actions-label" class="arena-action-label">MATCH &amp; ROOM</span><button id="return-select" class="text-button end-game-button" type="button" title="Stop the current game and return to setup" disabled>End game</button><button id="disconnect" class="text-button" type="button" title="Leave this online room" disabled>Disconnect</button></div>
           </div>
@@ -139,7 +139,7 @@
         <div id="side-assignment" class="side-assignment" hidden><span class="input-label">Your player side</span><div class="side-buttons" role="group" aria-label="Host player side"><button id="host-side-0" type="button" class="side-button selected" aria-pressed="true"><strong>PLAYER 1</strong><span>HOME</span></button><button id="host-side-1" type="button" class="side-button" aria-pressed="false"><strong>PLAYER 2</strong><span>AWAY</span></button></div><p id="side-assignment-copy" class="field-help"></p></div>
         <section class="ready-check" aria-labelledby="ready-check-title"><span class="step-number"><span class="step-digit">3</span><svg viewBox="0 0 5 7" aria-hidden="true" focusable="false" shape-rendering="crispEdges"><rect x="0" y="0" width="1" height="1"/><rect x="1" y="0" width="1" height="1"/><rect x="2" y="0" width="1" height="1"/><rect x="3" y="0" width="1" height="1"/><rect x="4" y="1" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="4" y="5" width="1" height="1"/><rect x="0" y="6" width="1" height="1"/><rect x="1" y="6" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></svg></span><div><h3 id="ready-check-title">Get ready</h3><p id="ready-copy">Choose your system and ROM above.</p></div><strong id="ready-state">CHOOSE ROM</strong><button id="controller-before-play" class="text-button controller-shortcut" type="button" aria-haspopup="dialog" aria-controls="controller-dialog">Set up controller</button></section>
         <button id="start-match" class="button start-button" aria-describedby="ready-copy setup-status" disabled>START GAME <span aria-hidden="true">→</span></button><p id="setup-status" class="field-help setup-status" role="status">Choose your system and ROM to begin. Online play is experimental.</p>
-        <details id="ram-viewer" class="ram-viewer"><summary>RAM viewer <span class="field-help-inline">watch game memory live · read-only</span></summary><div class="ram-viewer-inner"><p class="help-small">Type a work-RAM address (for example <code>FF1234</code> on Genesis or <code>7E1630</code> on SNES, or just the offset) and watch it update while you play. On Genesis you can also type NHL ’94 variable names such as <code>p1_2_x</code>. Viewing never changes the game, so it is safe online. <button id="ram-popout" class="text-button" type="button">Open in separate window</button></p><div id="ram-viewer-body"></div></div></details>
+
       </section>
     </div>
 
@@ -163,6 +163,7 @@
   <script src="./browser-check.js"></script>
   <script type="module" src="./savestate.js"></script>
   <script src="./ramviewer.js"></script>
+  <script src="./emulator-control.js"></script>
   <script src="./setup-collapse.js"></script>
 <script>
 (function(){

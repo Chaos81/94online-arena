@@ -116,6 +116,18 @@
     var tools = el('div', 'tools'), freeze = el('label'), fcb = el('input'), clear = el('button', '', 'Clear all');
     fcb.type = 'checkbox'; fcb.checked = state.frozen; freeze.appendChild(fcb); freeze.appendChild(doc.createTextNode(' Freeze display'));
     clear.type = 'button'; tools.appendChild(freeze); tools.appendChild(clear);
+    var csv = el('button', '', 'Load CSV…'), csvFile = el('input'), csvMsg = el('p', 'err'); csvMsg.style.color = '#475569';
+    csv.type = 'button'; csv.title = 'Each line: Label, RAM address'; csvFile.type = 'file'; csvFile.accept = '.csv,text/csv,text/plain'; csvFile.style.display = 'none';
+    tools.appendChild(csv); tools.appendChild(csvFile);
+    csv.addEventListener('click', function () { csvFile.click(); });
+    csvFile.addEventListener('change', function () {
+      var f = csvFile.files && csvFile.files[0]; if (!f) return;
+      f.text().then(function (txt) {
+        var r = importCsv(txt, type.value);
+        csvMsg.textContent = 'Loaded ' + r.added + ' address' + (r.added === 1 ? '' : 'es') + (r.skipped.length ? '; skipped line' + (r.skipped.length === 1 ? ' ' : 's ') + r.skipped.slice(0, 8).join(', ') + (r.skipped.length > 8 ? '…' : '') : '') + '.';
+      }, function () { csvMsg.textContent = 'Could not read that file.'; });
+      csvFile.value = '';
+    });
     var info = el('p', 'empty'), table = el('table'), head = el('thead'), body = el('tbody');
     var hr = el('tr'); ['NAME', 'ADDRESS', 'TYPE', 'DECIMAL', 'HEX', ''].forEach(function (h) { hr.appendChild(el('th', '', h)); });
     head.appendChild(hr); table.appendChild(head); table.appendChild(body);
@@ -123,7 +135,7 @@
     daddr.placeholder = 'Start address'; daddr.setAttribute('aria-label', 'Dump start address'); daddr.autocomplete = 'off'; dgo.type = 'submit';
     daddr.value = state.dumpText;
     dform.appendChild(daddr); dform.appendChild(dgo);
-    [form, err, tools, info, table, h4, dform, dump].forEach(function (n) { root.appendChild(n); });
+    [form, err, tools, csvMsg, info, table, h4, dform, dump].forEach(function (n) { root.appendChild(n); });
 
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
@@ -210,12 +222,13 @@
       state.prev.dump = bytes2;
       state.targets.forEach(function (t) {
         var d = t.dump; d.textContent = '';
-        for (var row = 0; row < DUMP_BYTES / 8; row++) {
-          d.appendChild(t.doc.createTextNode('$' + hex(start + row * 8, 6) + '  '));
-          for (var i = 0; i < 8; i++) {
-            var idx = row * 8 + i, s = hex(bytes2[idx], 2);
+        for (var row = 0; row < DUMP_BYTES / 16; row++) {
+          d.appendChild(t.doc.createTextNode('$' + hex(start + row * 16, 6) + '  '));
+          for (var i = 0; i < 16; i++) {
+            var idx = row * 16 + i, s = hex(bytes2[idx], 2);
             if (old && old[idx] !== bytes2[idx]) { var b = t.doc.createElement('b'); b.textContent = s; d.appendChild(b); d.appendChild(t.doc.createTextNode(' ')); }
             else d.appendChild(t.doc.createTextNode(s + ' '));
+            if (i === 7) d.appendChild(t.doc.createTextNode(' '));
           }
           d.appendChild(t.doc.createTextNode('\n'));
         }
@@ -248,23 +261,12 @@
   function tick() { syncPlatform(); update(); }
   function start() { if (!state.timer) state.timer = setInterval(tick, 100); }
 
-  function mountInPage() {
-    var host = document.getElementById('ram-viewer-body');
-    if (!host) return;
-    var style = document.createElement('style'); style.textContent = CSS; document.head.appendChild(style);
-    state.platform = null;
-    var t = build(document, host); state.targets.push(t); fillNames(t);
-    var pop = document.getElementById('ram-popout');
-    if (pop) pop.addEventListener('click', popOut);
-    syncPlatform(); start();
-  }
-
   function popOut() {
     var w = state.popup;
     if (w && !w.closed) { w.focus(); return; }
-    w = window.open('', 'nhl94online-ramviewer', 'width=520,height=640,resizable=yes,scrollbars=yes');
-    if (!w) { alert('The pop-up was blocked. Allow pop-ups for this site, or use the RAM viewer section on the page.'); return; }
-    state.popup = w;
+    w = window.open('', 'nhl94online-ramviewer', 'width=560,height=680,resizable=yes,scrollbars=yes');
+    if (!w) { alert('The pop-up was blocked. Allow pop-ups for this site, then click RAM viewer again.'); return; }
+    state.popup = w; syncPlatform();
     w.document.open();
     w.document.write('<!doctype html><meta charset="utf-8"><title>RAM viewer</title><style>body{margin:12px;background:#fff}' + CSS + '</style><div id="root"></div>');
     w.document.close();
@@ -272,10 +274,41 @@
     t.closed = function () { return w.closed; };
     state.targets.push(t); fillNames(t); renderAll();
     w.addEventListener('pagehide', function () { state.targets = state.targets.filter(function (o) { return o !== t; }); });
-    var details = document.getElementById('ram-viewer');
-    if (details) details.open = false;
+    start();
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountInPage);
-  else mountInPage();
+  // Split one CSV line into fields (handles "quoted, fields").
+  function csvFields(line) {
+    var out = [], cur = '', q = false;
+    for (var i = 0; i < line.length; i++) {
+      var c = line[i];
+      if (q) { if (c === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+      else if (c === '"') q = true;
+      else if (c === ',') { out.push(cur); cur = ''; }
+      else cur += c;
+    }
+    out.push(cur);
+    return out.map(function (f) { return f.trim(); });
+  }
+
+  // CSV: "Label, RAM address" per line. A header row, blank lines and # comments are skipped.
+  function importCsv(text, defaultType) {
+    var cfg = PLATFORMS[state.platform], added = 0, skipped = [];
+    text.replace(/^\uFEFF/, '').split(/\r?\n/).forEach(function (line, idx) {
+      if (!line.trim() || line.trim()[0] === '#') return;
+      var f = csvFields(line);
+      if (f.length < 2) { skipped.push(idx + 1); return; }
+      var r = parseAddress(f[1], state.platform);
+      if (r.error) { if (!(idx === 0 && !added)) skipped.push(idx + 1); return; }   // first line may be a header
+      var ty = r.type || defaultType;
+      if (r.addr + TYPES[ty].n > cfg.base + cfg.size) { skipped.push(idx + 1); return; }
+      state.watches.push({ id: state.nextId++, label: (f[0] || r.label || '').slice(0, 30), addr: r.addr, type: ty });
+      added++;
+    });
+    if (added) { save(); renderAll(); }
+    return { added: added, skipped: skipped };
+  }
+  state.importCsv = importCsv;
+
+  globalThis.__ramViewer = { open: popOut };
 })();
