@@ -27,6 +27,7 @@ Open <http://localhost:8000/>. Any static web host works (it also runs from a su
 - Direct vs TURN-relay indicator, ping / jitter / input-delay diagnostics, high-jitter notice
 - Emulator volume slider and mute
 - Username field (saved in the browser) shown next to your chat messages, with a Host or Guest tag
+- RAM viewer: type work-RAM addresses (or NHL '94 Genesis variable names) to watch live values and a 128-byte dump while playing; read-only, works in a separate window too
 - Online chat (Tab to jump to the chat box; in full screen, messages appear as an overlay and Tab opens a message line)
 - Replays: **Save replay** records every button press by frame (both players, local or online) into a
   small `.replay` file; **Watch replay** plays it back exactly by booting the same ROM from power-on.

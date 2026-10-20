@@ -36,6 +36,7 @@
 .field-help-inline{font-weight:400;opacity:.7;font-size:.85em}
 .chat-tag{font-style:normal;font-size:.72em;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 5px;border-radius:3px;background:#e2e8f0;color:#334155;vertical-align:1px}
 .chat-ov-log .chat-tag{background:rgba(255,255,255,.2);color:#fff}
+.ram-viewer{margin:.75rem 0;border:1px solid #cbd5e1;border-radius:8px;background:#fff}.ram-viewer>summary{cursor:pointer;padding:.55rem .75rem;font-weight:700}.ram-viewer-inner{padding:0 .75rem .75rem}.ram-viewer code{background:#f1f5f9;padding:0 3px;border-radius:3px}
 </style></head>
 <body>
   <a class="skip-link" href="#setup">Skip to match setup</a>
@@ -126,7 +127,8 @@
           <p class="arena-actions-help"></p>
         </div>
         <dl class="diagnostics" aria-label="Live connection measurements"><div><dt>ROUND TRIP</dt><dd id="stat-ping">—<small>ms</small></dd></div><div><dt>JITTER</dt><dd id="stat-jitter">—<small>ms</small></dd></div><div><dt>ROLLBACK</dt><dd id="stat-rollback">—<small>frames</small></dd></div><div><dt>INPUT DELAY</dt><dd id="stat-delay">—<small>frames</small></dd></div><div><dt>STABILITY</dt><dd id="stat-nettype" class="transport">—</dd></div><div><dt>TRANSPORT</dt><dd id="stat-transport" class="transport">Not connected</dd></div></dl>
-        <p class="connection-note">Distance still matters. Keep the game tab visible during online play. Brief interruptions get up to 30 seconds to return. <button id="copy-connection-report" class="text-button" type="button" hidden>Copy connection report</button></p><pre id="connection-report" class="results-output" tabindex="0" hidden></pre>
+        <p class="connection-note">Distance still matters. Keep the game tab visible during online play. Brief interruptions get up to 30 seconds to return. <button id="copy-connection-report" class="text-button" type="button" hidden>Copy connection report</button></p>
+        <details id="ram-viewer" class="ram-viewer"><summary>RAM viewer <span class="field-help-inline">watch game memory live · read-only</span></summary><div class="ram-viewer-inner"><p class="help-small">Type a work-RAM address (for example <code>FF1234</code> on Genesis or <code>7E1630</code> on SNES, or just the offset) and watch it update while you play. On Genesis you can also type NHL ’94 variable names such as <code>p1_2_x</code>. Viewing never changes the game, so it is safe online. <button id="ram-popout" class="text-button" type="button">Open in separate window</button></p><div id="ram-viewer-body"></div></div></details><pre id="connection-report" class="results-output" tabindex="0" hidden></pre>
       </section>
 
       <section class="setup-panel" id="setup" aria-labelledby="setup-title">
@@ -158,6 +160,7 @@
   </dialog>
   <script src="./browser-check.js"></script>
   <script type="module" src="./savestate.js"></script>
+  <script src="./ramviewer.js"></script>
 <script>
 (function(){
   var sl=document.getElementById('volume-slider'),mu=document.getElementById('volume-mute'),out=document.getElementById('volume-value');
