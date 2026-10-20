@@ -3,7 +3,7 @@
 // It never writes to the emulator, so it cannot change the game or desync an online match.
 // Genesis work RAM is $FF0000-$FFFFFF (64 KiB, big-endian values); SNES work RAM is
 // $7E0000-$7FFFFF (128 KiB, little-endian values). Short addresses such as 1234 are treated
-// as offsets from the start of work RAM. Genesis NHL '94 variable names (p1_2_x ...) also work.
+// as offsets from the start of work RAM.
 (function () {
   'use strict';
 
@@ -16,12 +16,11 @@
     u16: { n: 2, signed: false }, s16: { n: 2, signed: true },
     u32: { n: 4, signed: false }
   };
-  var RETRO_TYPE = { '|u1': 'u8', '|i1': 's8', '>u2': 'u16', '>i2': 's16', '>u4': 'u32' };
   var DUMP_BYTES = 128;
 
   var state = {
     watches: [], nextId: 1, frozen: false, dumpAddr: null, dumpText: '',
-    platform: null, names: null, targets: [], timer: null, popup: null, prev: {}
+    platform: null, targets: [], timer: null, popup: null, prev: {}
   };
 
   function arena() { return globalThis.__arena || null; }
@@ -48,16 +47,9 @@
   }
   function parseAddress(text, p) {
     var t = String(text || '').trim();
-    if (!t) return { error: 'Type an address such as FF1234 or a variable name.' };
-    if (p === 'genesis' && state.names) {
-      var key = t.toLowerCase();
-      if (state.names[key]) {
-        var nm = state.names[key];
-        return { addr: nm.addr, type: nm.type, label: key };
-      }
-    }
+    if (!t) return { error: 'Type an address such as FF1234.' };
     var h = t.replace(/^\$/, '').replace(/^0x/i, '').replace(/h$/i, '');
-    if (!/^[0-9a-f]{1,6}$/i.test(h)) return { error: 'Not a hex address or known name.' };
+    if (!/^[0-9a-f]{1,6}$/i.test(h)) return { error: 'Not a hex address.' };
     var full = normalise(parseInt(h, 16), p);
     if (full === null) {
       var cfg = PLATFORMS[p];
@@ -105,13 +97,12 @@
     function el(tag, cls, text) { var e = doc.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; }
 
     var form = el('form'), addr = el('input', 'addr'), lbl = el('input', 'lbl'), type = el('select'), add = el('button', '', 'Watch');
-    addr.placeholder = 'Address or name'; addr.setAttribute('aria-label', 'RAM address or variable name'); addr.setAttribute('list', 'rv-names-' + (doc === document ? 'm' : 'p')); addr.autocomplete = 'off';
+    addr.placeholder = 'Address (hex)'; addr.setAttribute('aria-label', 'RAM address'); addr.autocomplete = 'off';
     lbl.placeholder = 'Label (optional)'; lbl.maxLength = 30; lbl.setAttribute('aria-label', 'Label');
     type.setAttribute('aria-label', 'Value type');
     [['u8', '8-bit'], ['s8', '8-bit signed'], ['u16', '16-bit'], ['s16', '16-bit signed'], ['u32', '32-bit']].forEach(function (o) { var op = el('option', '', o[1]); op.value = o[0]; type.appendChild(op); });
     type.value = 'u16'; add.type = 'submit';
-    var dl = el('datalist'); dl.id = 'rv-names-' + (doc === document ? 'm' : 'p'); t.datalist = dl;
-    form.appendChild(addr); form.appendChild(type); form.appendChild(lbl); form.appendChild(add); form.appendChild(dl);
+    form.appendChild(addr); form.appendChild(type); form.appendChild(lbl); form.appendChild(add);
     var err = el('p', 'err'); err.setAttribute('role', 'alert');
     var tools = el('div', 'tools'), freeze = el('label'), fcb = el('input'), clear = el('button', '', 'Clear all');
     fcb.type = 'checkbox'; fcb.checked = state.frozen; freeze.appendChild(fcb); freeze.appendChild(doc.createTextNode(' Freeze display'));
@@ -141,7 +132,7 @@
       ev.preventDefault();
       var r = parseAddress(addr.value, state.platform);
       if (r.error) { err.textContent = r.error; return; }
-      var ty = r.type || type.value, name = lbl.value.trim() || r.label || '';
+      var ty = type.value, name = lbl.value.trim();
       var size = TYPES[ty].n, cfg = PLATFORMS[state.platform];
       if (r.addr + size > cfg.base + cfg.size) { err.textContent = 'That value runs past the end of work RAM.'; return; }
       err.textContent = '';
@@ -170,12 +161,6 @@
 
     t.body = body; t.info = info; t.dump = dump; t.err = err; t.fcb = fcb; t.daddr = daddr; t.table = table; t.addrInput = addr;
     return t;
-  }
-
-  function fillNames(t) {
-    t.datalist.textContent = '';
-    if (state.platform !== 'genesis' || !state.names) return;
-    Object.keys(state.names).sort().forEach(function (k) { var o = t.doc.createElement('option'); o.value = k; t.datalist.appendChild(o); });
   }
 
   // Rebuild the watch-list rows (after add/remove).
@@ -236,7 +221,7 @@
     } else state.targets.forEach(function (t) { t.dump.textContent = ''; });
   }
 
-  // Follow the loaded system: load that system's saved watch list and names.
+  // Follow the loaded system: load that system's saved watch list.
   function syncPlatform() {
     var a = arena(), p = a && a.platform;
     if (!PLATFORMS[p]) p = state.platform || 'genesis';
@@ -244,17 +229,6 @@
     state.platform = p; state.dumpAddr = null; state.dumpText = '';
     state.targets.forEach(function (t) { t.daddr.value = ''; });
     load();
-    if (p === 'genesis' && !state.names) {
-      import('./game/ramvars.js').then(function (m) {
-        var names = {};
-        Object.keys(m.default).forEach(function (k) {
-          var d = m.default[k], ty = RETRO_TYPE[d[1]];
-          if (ty) names[k.toLowerCase()] = { addr: d[0], type: ty };
-        });
-        state.names = names; state.targets.forEach(fillNames);
-      }).catch(function () {});
-    }
-    state.targets.forEach(fillNames);
     renderAll();
   }
 
@@ -272,7 +246,7 @@
     w.document.close();
     var t = build(w.document, w.document.getElementById('root'));
     t.closed = function () { return w.closed; };
-    state.targets.push(t); fillNames(t); renderAll();
+    state.targets.push(t); renderAll();
     w.addEventListener('pagehide', function () { state.targets = state.targets.filter(function (o) { return o !== t; }); });
     start();
   }
@@ -300,9 +274,9 @@
       if (f.length < 2) { skipped.push(idx + 1); return; }
       var r = parseAddress(f[1], state.platform);
       if (r.error) { if (!(idx === 0 && !added)) skipped.push(idx + 1); return; }   // first line may be a header
-      var ty = r.type || defaultType;
+      var ty = defaultType;
       if (r.addr + TYPES[ty].n > cfg.base + cfg.size) { skipped.push(idx + 1); return; }
-      state.watches.push({ id: state.nextId++, label: (f[0] || r.label || '').slice(0, 30), addr: r.addr, type: ty });
+      state.watches.push({ id: state.nextId++, label: f[0].slice(0, 30), addr: r.addr, type: ty });
       added++;
     });
     if (added) { save(); renderAll(); }
