@@ -28,7 +28,7 @@ Open <http://localhost:8000/>. Any static web host works (it also runs from a su
 - Emulator volume slider and mute
 - Username field (saved in the browser) shown next to your chat messages, with a Host or Guest tag
 - Setup panel collapses when a game starts (Show setup button brings it back)
-- EMULATOR CONTROL (under Play & Controls): **Reset emulator** restarts a local game from power-on; **RAM viewer** opens a separate window where you type work-RAM addresses to watch live values plus a 128-byte dump. It is read-only. **Load CSV** imports a watch list, one `Label,RAM address` per line (an optional header row is skipped)
+- EMULATOR CONTROL (under Play & Controls): **Reset emulator** restarts a local game from power-on (disabled online, where both players must stop together)
 - Online chat (Tab to jump to the chat box; in full screen, messages appear as an overlay and Tab opens a message line)
 - Replays: **Save replay** records every button press by frame (both players, local or online) into a
   small `.replay` file; **Watch replay** plays it back exactly by booting the same ROM from power-on.

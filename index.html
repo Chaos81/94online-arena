@@ -121,7 +121,7 @@
           <p id="connection-status" role="status"><span class="status-dot muted"></span>Offline · ready for setup</p>
           <div class="arena-actions">
             <div class="arena-action-group" role="group" aria-labelledby="play-actions-label"><span id="play-actions-label" class="arena-action-label">PLAY &amp; CONTROLS</span><button id="help-toolbar" class="text-button" type="button" aria-haspopup="dialog" aria-controls="help-dialog">Help</button><button id="fullscreen-toggle" class="text-button" type="button" aria-pressed="false">Full screen</button><button id="controller-setup" class="text-button" type="button">Controller</button><button id="scanlines-toggle" class="button small" type="button" aria-pressed="false">Scanlines: off</button><button id="pause-match" class="text-button" type="button" disabled>Pause</button><button id="replay-save" class="text-button" type="button" disabled title="Download a replay of this game">Save replay</button><button id="replay-watch" class="text-button" type="button" disabled title="Play back a saved replay">Watch replay</button><input id="replay-file" type="file" accept=".replay,application/json" hidden><span class="volume-control"><button id="volume-mute" class="text-button" type="button" aria-pressed="false" aria-label="Mute emulator sound">Volume</button><input id="volume-slider" type="range" min="0" max="100" step="1" value="100" aria-label="Emulator volume"><output id="volume-value" for="volume-slider">100%</output></span></div>
-            <div class="arena-action-group" role="group" aria-labelledby="emu-actions-label"><span id="emu-actions-label" class="arena-action-label">EMULATOR CONTROL</span><button id="emu-reset" class="text-button" type="button" disabled title="Restart the game from power-on (local games only)">Reset emulator</button><button id="ram-open" class="text-button" type="button" title="Open the RAM viewer in a separate window">RAM viewer</button></div>
+            <div class="arena-action-group" role="group" aria-labelledby="emu-actions-label"><span id="emu-actions-label" class="arena-action-label">EMULATOR CONTROL</span><button id="emu-reset" class="text-button" type="button" disabled title="Restart the game from power-on (local games only)">Reset emulator</button></div>
             <div class="arena-action-group" role="group" aria-labelledby="save-actions-label"><span id="save-actions-label" class="arena-action-label">SAVE STATES</span><button id="load-state" class="text-button" type="button" hidden disabled>Load state</button></div>
             <div class="arena-action-group" role="group" aria-labelledby="session-actions-label"><span id="session-actions-label" class="arena-action-label">MATCH &amp; ROOM</span><button id="return-select" class="text-button end-game-button" type="button" title="Stop the current game and return to setup" disabled>End game</button><button id="disconnect" class="text-button" type="button" title="Leave this online room" disabled>Disconnect</button></div>
           </div>
@@ -162,7 +162,6 @@
   </dialog>
   <script src="./browser-check.js"></script>
   <script type="module" src="./savestate.js"></script>
-  <script src="./ramviewer.js"></script>
   <script src="./emulator-control.js"></script>
   <script src="./setup-collapse.js"></script>
 <script>

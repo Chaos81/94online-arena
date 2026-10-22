@@ -1,8 +1,7 @@
-// EMULATOR CONTROL buttons: reset the emulator (local games) and open the RAM viewer window.
+// EMULATOR CONTROL: reset the emulator (local games).
 (function () {
   'use strict';
-  var reset = document.getElementById('emu-reset'), ram = document.getElementById('ram-open');
-  if (ram) ram.addEventListener('click', function () { if (globalThis.__ramViewer) globalThis.__ramViewer.open(); });
+  var reset = document.getElementById('emu-reset');
   if (!reset) return;
   var busy = false;
   function sync() {
